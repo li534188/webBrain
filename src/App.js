@@ -1,6 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {Button, Modal} from 'react-bootstrap'
+import {useSelector, useDispatch} from 'react-redux'
+import * as actions from './actions/infos'
 const THREE = window.THREE = require('three')
 require('three/examples/js/loaders/GLTFLoader')
 require('three/examples/js/controls/OrbitControls')
@@ -8,28 +11,59 @@ require('three/examples/js/controls/OrbitControls')
 require('three/src/math/Vector2')
 const {Raycaster}  = require('three/src/core/Raycaster')
 function App() {
-  getThree();
+  
+  //数据
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const pageIndex = useSelector(state=> state.global.selectName);
+  console.log(pageIndex)
+  GetThree();
   return (
     <div className="App">
       {/* 123 */}
+      <Button variant="success" onClick={handleShow}>测试</Button>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modal heading</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
-  );
+  );  
 }
 
-function getThree(){
+function GetThree(){
   console.log("执行函数")
   let scene, camera, renderer, mesh;
   let controls;
   let clock ;
   let delta; 
   let gLabel;
-
-  let _labelData = [{attributes:{x:0,y:90,z:60, textvalue:'视觉联络区'}, name:'vision'},
-                    {attributes:{x:0,y:110,z:0, textvalue:'主要运动区'}, name:'motion'}, 
-                    {attributes:{x:60,y:50,z:25, textvalue:'听觉联络区'}, name:'hearing'},  
-                    {attributes:{x:50,y:50,z:-75, textvalue:'额叶'}, name:'lobe'},  
-                    {attributes:{x:25,y:0,z:-5, textvalue:'小脑'}, name:'cerebellum'},                 
-                  ]
+  const dispatch = useDispatch();
+  let _labelData = [
+    {attributes:{x:0,y:90,z:70, textvalue:'视觉联络区'}, name:'vision'},
+    {attributes:{x:0,y:110,z:0, textvalue:'主要运动区'}, name:'motion'}, 
+    {attributes:{x:80,y:50,z:0, textvalue:'听觉联络区'}, name:'hearing'},  
+    {attributes:{x:-5,y:65,z:-80, textvalue:'额叶'}, name:'lobe'},  
+    {attributes:{x:25,y:0,z:-5, textvalue:'小脑'}, name:'cerebellum'},                 
+                  ];
+  let positionInfore = {
+    vision:{x:0,y:100,z:200},
+    motion:{x:0,y:200,z:100},
+    hearing:{x:180,y:100,z:10},
+    lobe:{x:0,y:100,z:-200},
+    cerebellum:{x:0,y:-60,z:-200},
+  }
 
   const init = ()=>{
     scene = new THREE.Scene();
@@ -153,12 +187,20 @@ function getThree(){
 
   // 点击后执行的方法
   const rorateAndSow = (name) =>{
-    camera.position.set(0,200,100)
+    const location = positionInfore[name]
+    dispatch(actions.changeType(name))
+    camera.position.set(location.x,location.y,location.z)
   }
   init();
   animate();
   
 }
 
+
+function model(){
+  return (
+    <div></div>
+  )
+}
 
 export default App;
