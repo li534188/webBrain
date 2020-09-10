@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {Button, Modal} from 'react-bootstrap'
@@ -11,38 +11,16 @@ require('three/examples/js/controls/OrbitControls')
 require('three/src/math/Vector2')
 const {Raycaster}  = require('three/src/core/Raycaster')
 function App() {
-  
-  //数据
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const pageIndex = useSelector(state=> state.global.selectName);
-  console.log(pageIndex)
   GetThree();
   return (
-    <div className="App">
-      {/* 123 */}
-      <Button variant="success" onClick={handleShow}>测试</Button>
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+    <div>
+      <Model />
     </div>
+    
   );  
 }
 
-function GetThree(){
+export function GetThree(){
   console.log("执行函数")
   let scene, camera, renderer, mesh;
   let controls;
@@ -184,7 +162,10 @@ function GetThree(){
       }
   }
   window.addEventListener("click",mousedown);//页面绑定鼠标点击事件
-
+  window.addEventListener("touchstart", e => {
+    e.preventDefault()
+    mousedown(e)
+   })
   // 点击后执行的方法
   const rorateAndSow = (name) =>{
     const location = positionInfore[name]
@@ -197,9 +178,45 @@ function GetThree(){
 }
 
 
-function model(){
+function Model(){
+   //数据
+   const [show, setShow] = useState(false);
+
+   const handleClose = () => setShow(false);
+ 
+   const handleShow = () => setShow(true);
+   const pageIndex = useSelector(state=> state.global.selectName);
+   let mock = {
+    vision:{info:'负责沟通我们视觉上的处理',title:'视觉处理',url:''},
+    motion:{info:'负责沟通我们视觉上的处理',title:'视觉处理',url:''},
+    hearing:{info:'负责沟通我们视觉上的处理',title:'视觉处理',url:''},
+    lobe:{info:'负责沟通我们视觉上的处理',title:'视觉处理',url:''},
+    cerebellum:{info:'负责沟通我们视觉上的处理',title:'视觉处理',url:''},
+   }
+   useEffect(()=>{
+     if(mock[pageIndex]){
+      handleShow()
+     }
+   },[pageIndex])
+
   return (
-    <div></div>
+    <div className="App">
+      {/* 123 */}
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+        <Modal.Title>{mock[pageIndex]?mock[pageIndex].title:null}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{mock[pageIndex]?mock[pageIndex].info:null}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   )
 }
 
